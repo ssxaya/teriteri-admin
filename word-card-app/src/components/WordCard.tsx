@@ -65,10 +65,17 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
           ))}
         </div>
         
-        <div className="flex items-center justify-center">
-          <span className="text-sm sm:text-base text-slate-400 font-medium">
-            {currentIndex + 1} / {total}
-          </span>
+        <div className="flex items-center justify-center space-x-3">
+          {Array.from({ length: total }).map((_, idx) => (
+            <div
+              key={idx}
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                idx === currentIndex 
+                  ? 'bg-slate-800 scale-125' 
+                  : 'bg-slate-300'
+              }`}
+            />
+          ))}
         </div>
       </div>
     </div>
