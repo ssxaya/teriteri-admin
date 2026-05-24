@@ -47,7 +47,10 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
       onTouchEnd={onTouchEnd}
     >
       <div className="text-center w-full max-w-2xl">
-        <p className={`${themeConfig.phoneticFontMap[themeConfig.phoneticSize]} ${themeConfig.colors.phonetic} mb-4 font-light`}>
+        <p 
+          className={`${themeConfig.colors.phonetic} mb-4 font-light`}
+          style={{ fontSize: `${themeConfig.phoneticSize}px` }}
+        >
           {word.phonetic}
         </p>
         
@@ -59,7 +62,8 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
           {word.meaning.map((meaning, idx) => (
             <p 
               key={idx} 
-              className={`${themeConfig.meaningFontMap[themeConfig.meaningSize]} ${themeConfig.colors.meaning} leading-relaxed`}
+              className={`${themeConfig.colors.meaning} leading-relaxed`}
+              style={{ fontSize: `${themeConfig.meaningSize}px` }}
             >
               {meaning}
             </p>
