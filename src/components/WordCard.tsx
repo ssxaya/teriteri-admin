@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Word } from "@/types/word";
 import { themeConfig } from "@/config/theme";
 
@@ -7,17 +7,79 @@ interface WordCardProps {
   word: Word;
   onNext: () => void;
   onPrev: () => void;
+  onIndexChange: (index: number) => void;
   currentIndex: number;
   total: number;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ word, onNext, onPrev, currentIndex, total }) => {
+const WordCard: React.FC<WordCardProps> = ({ word, onNext, onPrev, onIndexChange, currentIndex, total }) => {
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
   const [touchStartTime, setTouchStartTime] = useState<number>(0);
   const [activeTouches, setActiveTouches] = useState(0);
+  const [isDraggingProgress, setIsDraggingProgress] = useState(false);
   const lastTouchCountRef = useRef(0);
+  const progressContainerRef = useRef<HTMLDivElement>(null);
   const minSwipeDistance = 50;
+
+  // 处理进度条拖动
+  const handleProgressMouseDown = (e: React.MouseEvent) => {
+    setIsDraggingProgress(true);
+    updateProgressFromPosition(e.clientX);
+  };
+
+  const handleProgressTouchStart = (e: React.TouchEvent) => {
+    setIsDraggingProgress(true);
+    if (e.touches.length === 1) {
+      updateProgressFromPosition(e.touches[0].clientX);
+    }
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDraggingProgress) {
+        updateProgressFromPosition(e.clientX);
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingProgress(false);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDraggingProgress && e.touches.length === 1) {
+        updateProgressFromPosition(e.touches[0].clientX);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsDraggingProgress(false);
+    };
+
+    if (isDraggingProgress) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: true });
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDraggingProgress]);
+
+  const updateProgressFromPosition = (clientX: number) => {
+    if (progressContainerRef.current) {
+      const rect = progressContainerRef.current.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      const percentage = Math.max(0, Math.min(1, relativeX / rect.width));
+      const newIndex = Math.round(percentage * (total - 1));
+      onIndexChange(newIndex);
+    }
+  };
 
   // 处理鼠标点击
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -136,17 +198,26 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, onPrev, currentIndex,
               {Array.from({ length: total }).map((_, idx) => (
                 <div
                   key={idx}
-                  className={`${themeConfig.dotSize} rounded-full transition-all duration-300 ${
+                  className={`${themeConfig.dotSize} rounded-full transition-all duration-300 cursor-pointer ${
                     idx === currentIndex 
                       ? `${themeConfig.colors.dotActive} scale-150` 
                       : themeConfig.colors.dotInactive
                   }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onIndexChange(idx);
+                  }}
                 />
               ))}
             </div>
           ) : (
             // 单词数 >10 时用进度条
-            <div className="w-48 h-1.5 bg-slate-200 rounded-full relative">
+            <div 
+              ref={progressContainerRef}
+              className="w-48 h-1.5 bg-slate-200 rounded-full relative cursor-pointer"
+              onMouseDown={handleProgressMouseDown}
+              onTouchStart={handleProgressTouchStart}
+            >
               <div 
                 className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-slate-800 transition-all duration-300"
                 style={{ left: `${(currentIndex / (total - 1)) * 100}%` }}

@@ -24,6 +24,10 @@ export default function Home() {
     setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
   };
 
+  const handleIndexChange = (index: number) => {
+    setCurrentIndex(index);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -45,6 +49,7 @@ export default function Home() {
       word={words[currentIndex]}
       onNext={handleNext}
       onPrev={handlePrev}
+      onIndexChange={handleIndexChange}
       currentIndex={currentIndex}
       total={words.length}
     />
