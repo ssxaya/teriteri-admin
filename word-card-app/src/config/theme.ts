@@ -6,7 +6,7 @@ export const themeConfig = {
   meaningSize: 18,
   
   // 圆点大小（单位：Tailwind尺寸）
-  dotSize: 'w-2 h-2',
+  dotSize: 'w-1 h-1',
   
   // 颜色配置
   colors: {

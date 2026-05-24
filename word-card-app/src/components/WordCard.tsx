@@ -40,7 +40,7 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
 
   return (
     <div 
-      className="min-h-screen min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 py-8 pt-safe-top pb-safe-bottom cursor-pointer select-none"
+      className="relative min-h-screen min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 py-8 pt-safe-top pb-safe-bottom cursor-pointer select-none"
       onClick={onNext}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -70,13 +70,13 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
           ))}
         </div>
         
-        <div className="flex items-center justify-center space-x-2">
+        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center space-x-2">
           {Array.from({ length: total }).map((_, idx) => (
             <div
               key={idx}
               className={`${themeConfig.dotSize} rounded-full transition-all duration-300 ${
                 idx === currentIndex 
-                  ? `${themeConfig.colors.dotActive} scale-125` 
+                  ? `${themeConfig.colors.dotActive} scale-150` 
                   : themeConfig.colors.dotInactive
               }`}
             />
