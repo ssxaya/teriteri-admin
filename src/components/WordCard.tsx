@@ -1,37 +1,92 @@
 
-import React, { useState } from "react";
-import { Word } from "../types/word";
+import React, { useState, useRef } from "react";
+import { Word } from "@/types/word";
 import { themeConfig } from "@/config/theme";
 
 interface WordCardProps {
   word: Word;
   onNext: () => void;
+  onPrev: () => void;
   currentIndex: number;
   total: number;
 }
 
-const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }) => {
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+const WordCard: React.FC<WordCardProps> = ({ word, onNext, onPrev, currentIndex, total }) => {
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
+  const [touchStartTime, setTouchStartTime] = useState<number>(0);
+  const [activeTouches, setActiveTouches] = useState(0);
+  const lastTouchCountRef = useRef(0);
   const minSwipeDistance = 50;
 
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-    
-    if (isLeftSwipe || isRightSwipe) {
+  // 处理鼠标点击
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 0) { // 左键
       onNext();
+    } else if (e.button === 2) { // 右键
+      onPrev();
+    }
+  };
+
+  // 阻止右键菜单
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
+
+  // 触摸开始
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const now = Date.now();
+    setActiveTouches(e.touches.length);
+    lastTouchCountRef.current = e.touches.length;
+    
+    if (e.touches.length === 1) {
+      setTouchStartTime(now);
+      setTouchStart({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      });
+    }
+  };
+
+  // 触摸移动
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setActiveTouches(e.touches.length);
+    
+    if (e.touches.length === 1) {
+      setTouchEnd({
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      });
+    }
+  };
+
+  // 触摸结束
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const now = Date.now();
+    const touchDuration = now - touchStartTime;
+    
+    // 检查是否是双指点击（快速释放）
+    if (lastTouchCountRef.current === 2 && e.touches.length === 0) {
+      onPrev();
+      setTouchStart(null);
+      setTouchEnd(null);
+      return;
+    }
+    
+    // 单指点击
+    if (touchStart && touchDuration < 300) {
+      onNext();
+    } else if (touchStart && touchEnd) {
+      // 滑动处理
+      const distance = touchStart.x - touchEnd.x;
+      const isLeftSwipe = distance > minSwipeDistance;
+      const isRightSwipe = distance < -minSwipeDistance;
+      
+      if (isLeftSwipe) {
+        onNext();
+      } else if (isRightSwipe) {
+        onPrev();
+      }
     }
     
     setTouchStart(null);
@@ -41,10 +96,11 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
   return (
     <div 
       className="relative min-h-screen min-h-[100dvh] bg-white flex flex-col items-center justify-center px-6 py-8 pt-safe-top pb-safe-bottom cursor-pointer select-none"
-      onClick={onNext}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
+      onMouseDown={handleMouseDown}
+      onContextMenu={handleContextMenu}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <div className="text-center w-full max-w-2xl">
         <p 

@@ -20,6 +20,10 @@ export default function Home() {
     setCurrentIndex((prev) => (prev + 1) % words.length);
   };
 
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + words.length) % words.length);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -40,6 +44,7 @@ export default function Home() {
     <WordCard
       word={words[currentIndex]}
       onNext={handleNext}
+      onPrev={handlePrev}
       currentIndex={currentIndex}
       total={words.length}
     />
