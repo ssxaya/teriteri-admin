@@ -73,17 +73,30 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
           ))}
         </div>
         
-        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center space-x-2">
-          {Array.from({ length: total }).map((_, idx) => (
-            <div
-              key={idx}
-              className={`${themeConfig.dotSize} rounded-full transition-all duration-300 ${
-                idx === currentIndex 
-                  ? `${themeConfig.colors.dotActive} scale-150` 
-                  : themeConfig.colors.dotInactive
-              }`}
-            />
-          ))}
+        <div className="absolute bottom-8 left-0 right-0 flex items-center justify-center">
+          {total <= 10 ? (
+            // 单词数 ≤10 时用圆点
+            <div className="flex items-center justify-center space-x-2">
+              {Array.from({ length: total }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={`${themeConfig.dotSize} rounded-full transition-all duration-300 ${
+                    idx === currentIndex 
+                      ? `${themeConfig.colors.dotActive} scale-150` 
+                      : themeConfig.colors.dotInactive
+                  }`}
+                />
+              ))}
+            </div>
+          ) : (
+            // 单词数 >10 时用进度条
+            <div className="w-48 h-1.5 bg-slate-200 rounded-full relative">
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 w-0.5 h-4 bg-slate-800 transition-all duration-300"
+                style={{ left: `${(currentIndex / (total - 1)) * 100}%` }}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
