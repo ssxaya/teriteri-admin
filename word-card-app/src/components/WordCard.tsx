@@ -54,7 +54,10 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
           {word.phonetic}
         </p>
         
-        <h1 className={`text-5xl sm:text-6xl md:text-7xl font-bold ${themeConfig.colors.word} mb-8 sm:mb-10 tracking-tight leading-tight`}>
+        <h1 
+          className={`font-bold ${themeConfig.colors.word} mb-8 sm:mb-10 tracking-tight leading-tight`}
+          style={{ fontSize: `${themeConfig.wordSize}px` }}
+        >
           {word.word}
         </h1>
         

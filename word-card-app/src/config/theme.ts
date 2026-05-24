@@ -1,4 +1,7 @@
 export const themeConfig = {
+  // 英文单词字体大小（单位：px）
+  wordSize: 48,
+  
   // 音标字体大小（单位：px）
   phoneticSize: 16,
   
