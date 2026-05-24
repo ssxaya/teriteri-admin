@@ -1,6 +1,7 @@
 
 import React, { useState } from "react";
 import { Word } from "../types/word";
+import { themeConfig } from "@/config/theme";
 
 interface WordCardProps {
   word: Word;
@@ -46,33 +47,33 @@ const WordCard: React.FC<WordCardProps> = ({ word, onNext, currentIndex, total }
       onTouchEnd={onTouchEnd}
     >
       <div className="text-center w-full max-w-2xl">
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold text-slate-800 mb-6 sm:mb-8 tracking-tight leading-tight">
-          {word.word}
-        </h1>
-        
-        <p className="text-2xl sm:text-3xl md:text-4xl text-slate-500 mb-8 sm:mb-10 font-light">
+        <p className={`${themeConfig.phoneticFontMap[themeConfig.phoneticSize]} ${themeConfig.colors.phonetic} mb-4 font-light`}>
           {word.phonetic}
         </p>
         
-        <div className="space-y-4 sm:space-y-5 mb-10 sm:mb-12">
+        <h1 className={`text-5xl sm:text-6xl md:text-7xl font-bold ${themeConfig.colors.word} mb-8 sm:mb-10 tracking-tight leading-tight`}>
+          {word.word}
+        </h1>
+        
+        <div className="space-y-3 sm:space-y-4 mb-12 sm:mb-16">
           {word.meaning.map((meaning, idx) => (
             <p 
               key={idx} 
-              className="text-xl sm:text-2xl md:text-3xl text-slate-700 leading-relaxed"
+              className={`${themeConfig.meaningFontMap[themeConfig.meaningSize]} ${themeConfig.colors.meaning} leading-relaxed`}
             >
               {meaning}
             </p>
           ))}
         </div>
         
-        <div className="flex items-center justify-center space-x-3">
+        <div className="flex items-center justify-center space-x-2">
           {Array.from({ length: total }).map((_, idx) => (
             <div
               key={idx}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+              className={`${themeConfig.dotSize} rounded-full transition-all duration-300 ${
                 idx === currentIndex 
-                  ? 'bg-slate-800 scale-125' 
-                  : 'bg-slate-300'
+                  ? `${themeConfig.colors.dotActive} scale-125` 
+                  : themeConfig.colors.dotInactive
               }`}
             />
           ))}
