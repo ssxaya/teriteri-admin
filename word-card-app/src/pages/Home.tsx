@@ -1,20 +1,47 @@
-import React, { useState } from "react";
-import WordCard from "../components/WordCard";
-import { initialWords } from "../data/words";
+import React, { useState, useEffect } from "react";
+import WordCard from "@/components/WordCard";
+import { loadWordsFromTXT } from "@/utils/wordLoader";
+import { Word } from "@/types/word";
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [words, setWords] = useState<Word[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // 加载单词
+    loadWordsFromTXT().then(loadedWords => {
+      setWords(loadedWords);
+      setLoading(false);
+    });
+  }, []);
 
   const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % initialWords.length);
+    setCurrentIndex((prev) => (prev + 1) % words.length);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-slate-400">加载中...</div>
+      </div>
+    );
+  }
+
+  if (words.length === 0) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-slate-400">未找到单词</div>
+      </div>
+    );
+  }
 
   return (
     <WordCard
-      word={initialWords[currentIndex]}
+      word={words[currentIndex]}
       onNext={handleNext}
       currentIndex={currentIndex}
-      total={initialWords.length}
+      total={words.length}
     />
   );
 }
